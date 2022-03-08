@@ -64,15 +64,22 @@ class AESCrypto():
         cipher = AES.new(private_key, AES.MODE_CBC, iv)
         return self.unpad(cipher.decrypt(enc[16:])).decode('utf-8')
 
-class User():
+class Manager():
     """Class to handle the User interaction and the database operations
     """
     def __init__(self):
         self.db = PWModel()
         self.user_id = None
+        self.user_name = None
         self.__priv_key = None
         self.crypter = AESCrypto()
-
+        
+    def __repr__(self):
+        if self.user_name == None:
+            return f"Password-Manager Object: No User logged in"
+        else: 
+            return f"Password-Manager Object: {self.user_name} logged in"
+        
     def is_logged_in(func):
         """Decorator Fuction to check if a User is logged in.
         """
@@ -97,17 +104,18 @@ class User():
         if bcrypt.checkpw(password.encode('utf-8'), hash):
             self.__priv_key = self.crypter.get_private_key(password)
             self.user_id = id
+            self.user_name = username
         else:
             raise AuthenticationError("Password incorrect")
      
 
     
-    def create_user(self,username,password) -> None:
+    def create_user(self,username: str,password: str) -> None:
         """Creates a new user
 
         Args:
-            username (_type_): username
-            password (_type_): password
+            username (str): username
+            password (str): password
         """
         hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.db.create_user(username,hash)

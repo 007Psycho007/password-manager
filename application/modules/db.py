@@ -16,7 +16,7 @@ class PWModel():
         self.conn = lite.connect("db/passwords.sqlite")
         self.cursor = self.conn.cursor()
         self.create_model()
-        
+
     def __del__(self) -> None:
         self.conn.close()
         
